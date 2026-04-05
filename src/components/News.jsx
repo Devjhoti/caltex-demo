@@ -51,6 +51,7 @@ export default function News() {
 
   return (
     <section 
+      id="news-section"
       ref={containerRef}
       style={{ 
         position: 'relative', 

@@ -24,6 +24,13 @@ export default function Products({ setCartItems, setIsCheckoutOpen }) {
     } else if (!showCatalogue && window.lenis) {
       window.lenis.start();
     }
+
+    const openHandler = () => setShowCatalogue(true);
+    window.addEventListener('openCatalogue', openHandler);
+
+    return () => {
+      window.removeEventListener('openCatalogue', openHandler);
+    };
   }, [showCatalogue]);
 
   const handleAddToCart = (e, product) => {
@@ -301,8 +308,25 @@ export default function Products({ setCartItems, setIsCheckoutOpen }) {
       {/* End Sticky Wrapper */}
 
       {/* Full CSS Sleek Catalogue Overlay Modal */}
-      {showCatalogue && (
-        <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(circle at center, rgba(1,75,96,0.95) 0%, rgba(0,25,35,0.98) 100%)', backdropFilter: 'blur(24px)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
+      <div 
+        style={{ 
+          position: 'fixed', 
+          inset: 0, 
+          background: 'radial-gradient(circle at center, rgba(1,75,96,0.95) 0%, rgba(0,25,35,0.98) 100%)', 
+          backdropFilter: 'blur(24px)', 
+          zIndex: 9999, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          color: '#FFF',
+          opacity: showCatalogue ? 1 : 0,
+          visibility: showCatalogue ? 'visible' : 'hidden',
+          transform: showCatalogue ? 'scale(1)' : 'scale(0.95)',
+          transition: 'opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+          pointerEvents: showCatalogue ? 'auto' : 'none'
+        }}
+      >
 
           {/* Header Row aligned tightly */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '90%', maxWidth: '1600px', marginBottom: '4rem' }}>
@@ -355,7 +379,6 @@ export default function Products({ setCartItems, setIsCheckoutOpen }) {
             ))}
           </div>
         </div>
-      )}
 
     </section>
   );

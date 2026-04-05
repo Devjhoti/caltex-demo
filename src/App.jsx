@@ -12,6 +12,7 @@ import News from './components/News';
 import Footer from './components/Footer';
 import CheckoutModal from './components/CheckoutModal';
 import CartModal from './components/CartModal';
+import CaltexAgent from './components/CaltexAgent';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -75,6 +76,9 @@ function App() {
         onClose={() => setIsCheckoutOpen(false)} 
         cartItems={cartItems} 
       />
+
+      {/* Global AI Floating Agent */}
+      <CaltexAgent />
     </div>
   );
 }

@@ -49,10 +49,36 @@ export default function Navbar({ cartCount = 0, setIsCartOpen }) {
         />
       </div>
       <div style={{ display: 'flex', gap: '3rem', fontWeight: 600, fontSize: '1.1rem', letterSpacing: '0.05em', textTransform: 'uppercase', alignItems: 'center' }}>
+        <style>
+          {`
+            .nav-link {
+              position: relative;
+              text-decoration: none;
+              color: inherit;
+              cursor: pointer;
+              padding-bottom: 4px;
+            }
+            .nav-link::after {
+              content: '';
+              position: absolute;
+              width: 0;
+              height: 2px;
+              display: block;
+              bottom: 0;
+              left: 50%;
+              background: #FF0000;
+              transition: width 0.3s ease, left 0.3s ease;
+            }
+            .nav-link:hover::after {
+              width: 100%;
+              left: 0;
+            }
+          `}
+        </style>
 
-        <a className="nav-link">Products</a>
-        <a className="nav-link">Technology</a>
-        <a className="nav-link">Locate Us</a>
+        <a className="nav-link" onClick={() => window.dispatchEvent(new Event('openCatalogue'))}>Products</a>
+        <a className="nav-link" onClick={() => window.lenis?.scrollTo('#news-section')}>News</a>
+        <a className="nav-link" onClick={() => window.lenis?.scrollTo('bottom')}>Locate Us</a>
         
         <div 
           id="cart-icon"
