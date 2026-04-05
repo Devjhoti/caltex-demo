@@ -1,0 +1,47 @@
+@font-face {
+  font-family: 'ITC Franklin Gothic LT';
+  src: url('/fonts/ITC Franklin Gothic LT Book Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ITC Franklin Gothic LT';
+  src: url('/fonts/ITC Franklin Gothic LT Demi Regular.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ITC Franklin Gothic LT';
+  src: url('/fonts/ITC Franklin Gothic LT Heavy Regular.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+:root {
+  --red: #FF0000;
+  --teal: #014B60;
+  --gray-light: #D0D0D0;
+  --gray-mid: #979A9C;
+  --white: #FFFFFF;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'ITC Franklin Gothic LT', sans-serif;
+  background-color: var(--white);
+  color: var(--teal);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
