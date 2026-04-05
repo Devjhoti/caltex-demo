@@ -8,11 +8,17 @@ import Hero from './components/Hero';
 import Navbar from './components/Navbar';
 import WhoWeAre from './components/WhoWeAre';
 import Products from './components/Products';
+import Footer from './components/Footer';
+import CheckoutModal from './components/CheckoutModal';
+import CartModal from './components/CartModal';
 
 gsap.registerPlugin(ScrollTrigger);
 
 function App() {
   const [preloading, setPreloading] = useState(true);
+  const [cartItems, setCartItems] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   useEffect(() => {
     // Initialize Lenis
@@ -49,10 +55,24 @@ function App() {
       {preloading && <Preloader onComplete={() => setPreloading(false)} />}
       
       {/* We mount these to allow canvas/assets to begin loading while preloader shows */}
-      <Navbar />
+      <Navbar cartCount={cartItems.reduce((acc, i) => acc + i.quantity, 0)} setIsCartOpen={setIsCartOpen} />
       <Hero />
       <WhoWeAre />
-      <Products />
+      <Products setCartItems={setCartItems} setIsCheckoutOpen={setIsCheckoutOpen} />
+      <Footer />
+
+      <CartModal 
+        isOpen={isCartOpen} 
+        onClose={() => setIsCartOpen(false)} 
+        cartItems={cartItems} 
+        setCartItems={setCartItems} 
+        onProceed={() => setIsCheckoutOpen(true)}
+      />
+      <CheckoutModal 
+        isOpen={isCheckoutOpen} 
+        onClose={() => setIsCheckoutOpen(false)} 
+        cartItems={cartItems} 
+      />
     </div>
   );
 }

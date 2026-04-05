@@ -1,226 +1,218 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 
-export default function CheckoutModal({ isOpen, onClose }) {
-  const [step, setStep] = useState(1);
-  const [paymentTab, setPaymentTab] = useState('mobile'); // mobile | card
-  const [mobileMethod, setMobileMethod] = useState(''); // bkash, nagad, rocket
-  const [cardNumber, setCardNumber] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
+export default function CheckoutModal({ isOpen, onClose, cartItems }) {
+  const overlayRef = useRef(null);
+  const containerRef = useRef(null);
+  const [phase, setPhase] = useState('details'); // 'details' or 'payment'
 
   useEffect(() => {
     if (isOpen) {
-      setStep(1);
-      setIsSuccess(false);
-      gsap.fromTo('.checkout-overlay', { opacity: 0 }, { opacity: 1, duration: 0.4 });
-      gsap.fromTo('.checkout-card', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, delay: 0.1, ease: 'power3.out' });
+      if (window.lenis) window.lenis.stop();
+      setPhase('details');
+      gsap.to(overlayRef.current, { opacity: 1, duration: 0.4, ease: 'power2.out', display: 'flex' });
+      gsap.fromTo(containerRef.current, 
+        { y: 50, opacity: 0, scale: 0.95 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.5)', delay: 0.1 }
+      );
+    } else {
+      if (window.lenis) window.lenis.start();
+      gsap.to(containerRef.current, { y: 20, opacity: 0, scale: 0.95, duration: 0.3, ease: 'power2.in' });
+      gsap.to(overlayRef.current, { opacity: 0, duration: 0.3, ease: 'power2.in', onComplete: () => {
+        if (overlayRef.current) gsap.set(overlayRef.current, { display: 'none' });
+      }});
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  const handleClose = () => {
-    gsap.to('.checkout-overlay', { opacity: 0, duration: 0.3, onComplete: onClose });
+  const handleProceed = (e) => {
+    e.preventDefault();
+    setPhase('payment');
   };
 
-  const handlePlaceOrder = () => {
-    setIsSuccess(true);
-    // Animate checkmark
-    setTimeout(() => {
-      gsap.fromTo('.success-check', 
-        { strokeDashoffset: 100 }, 
-        { strokeDashoffset: 0, duration: 0.8, ease: 'power2.out' }
-      );
-    }, 100);
+  const inputStyle = {
+    width: '100%',
+    padding: '1rem',
+    borderRadius: '12px',
+    border: '1px solid #ddd',
+    fontSize: '1rem',
+    fontFamily: "'ITC Franklin Gothic LT', sans-serif",
+    boxSizing: 'border-box',
+    background: '#fff',
+    color: '#014B60',
+    marginBottom: '1rem'
   };
 
-  const formatCardNumber = (e) => {
-    let val = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    let formatted = val.match(/.{1,4}/g)?.join(' ') || val;
-    setCardNumber(formatted.substring(0, 19));
+  const paymentBtnStyle = {
+    width: '100%',
+    padding: '1.25rem',
+    background: '#fff',
+    border: '2px solid #eee',
+    borderRadius: '12px',
+    fontWeight: 900,
+    fontSize: '1.1rem',
+    color: '#014B60',
+    cursor: 'pointer',
+    textAlign: 'left',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+    marginBottom: '1rem',
+    transition: 'all 0.2s',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    fontFamily: "'ITC Franklin Gothic LT', sans-serif"
   };
-
-  const getCardType = () => {
-    if (cardNumber.startsWith('4')) return 'VISA';
-    if (cardNumber.startsWith('5')) return 'MASTER';
-    return '';
-  };
-
-  const renderProgress = () => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '200px', margin: '0 auto 2rem auto', position: 'relative' }}>
-      <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '2px', background: '#E0E0E0', zIndex: 0 }} />
-      {[1, 2, 3].map(s => {
-        let bg = s === step ? 'var(--red)' : s < step ? 'var(--teal)' : '#E0E0E0';
-        return (
-          <div key={s} style={{ width: '12px', height: '12px', borderRadius: '50%', background: bg, zIndex: 1, transition: 'background 0.3s' }} />
-        );
-      })}
-    </div>
-  );
 
   return (
-    <div className="checkout-overlay" style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
-      fontFamily: "'ITC Franklin Gothic LT', sans-serif"
-    }}>
-      <div className="checkout-card" style={{
-        background: '#FFFFFF', maxWidth: '560px', width: '90%', borderRadius: '4px', padding: '2.5rem',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.3)', position: 'relative'
-      }}>
-        <button onClick={handleClose} style={{ position: 'absolute', top: '1rem', right: '1.5rem', background: 'none', border: 'none', fontSize: '2rem', cursor: 'pointer', color: '#333' }}>×</button>
+    <div 
+      ref={overlayRef}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(1, 75, 96, 0.8)',
+        backdropFilter: 'blur(10px)',
+        zIndex: 99999,
+        display: 'none',
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: 0,
+        padding: '2rem'
+      }}
+      onClick={onClose}
+    >
+      <div 
+        ref={containerRef}
+        style={{
+          width: '100%',
+          maxWidth: '500px',
+          background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
+          borderRadius: '24px',
+          padding: '3rem',
+          boxShadow: '0 40px 80px rgba(0,0,0,0.2)',
+          position: 'relative',
+          maxHeight: '90vh',
+          overflowY: 'auto'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button 
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            background: 'rgba(0,0,0,0.05)',
+            border: 'none',
+            fontSize: '1.5rem',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#014B60',
+            transition: 'background 0.3s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
+        >
+          &times;
+        </button>
 
-        {!isSuccess ? (
-          <>
-            {renderProgress()}
+        <h2 style={{ fontFamily: "'ITC Franklin Gothic LT', sans-serif", fontSize: '2rem', fontWeight: 900, color: '#014B60', margin: '0 0 1rem 0', textTransform: 'uppercase' }}>
+          {phase === 'details' ? 'Delivery Details' : 'Payment Method'}
+        </h2>
+        <p style={{ fontFamily: "'ITC Franklin Gothic LT', sans-serif", fontSize: '0.9rem', color: '#666', marginBottom: '2rem', lineHeight: 1.5 }}>
+          {phase === 'details' ? 'Please enter your shipping information below to proceed with your order.' : 'Select a secure payment provider to complete your transaction.'}
+        </p>
+
+        {/* Order Summary Miniature */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', background: 'rgba(1, 75, 96, 0.05)', borderRadius: '12px', border: '1px solid rgba(1, 75, 96, 0.1)', marginBottom: '2rem' }}>
+          <span style={{ fontWeight: 800, color: '#014B60', textTransform: 'uppercase', fontFamily: "'ITC Franklin Gothic LT', sans-serif" }}>Total to Pay</span>
+          <span style={{ fontWeight: 900, color: '#FF0000', fontSize: '1.1rem', fontFamily: "'ITC Franklin Gothic LT', sans-serif" }}>৳{subtotal.toLocaleString()}</span>
+        </div>
+
+        {phase === 'details' ? (
+          <form onSubmit={handleProceed} style={{ display: 'flex', flexDirection: 'column' }}>
+            <input type="text" placeholder="Full Name" required style={inputStyle} />
+            <input type="tel" placeholder="Phone Number (e.g. 017...)" required style={inputStyle} />
+            <textarea placeholder="Delivery Address" required rows="3" style={{ ...inputStyle, resize: 'none' }} />
             
-            {step === 1 && (
-              <div>
-                <h3 style={{ color: 'var(--teal)', fontSize: '1.8rem', fontWeight: 900, marginBottom: '1.5rem', textTransform: 'uppercase' }}>Your Details</h3>
-                <FloatingInput label="Full Name" />
-                <FloatingInput label="Email Address" type="email" />
-                <FloatingInput label="Phone Number" type="tel" />
-                <button onClick={() => setStep(2)} style={btnStyle('var(--teal)')}>Next Step</button>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div>
-                <h3 style={{ color: 'var(--teal)', fontSize: '1.8rem', fontWeight: 900, marginBottom: '1.5rem', textTransform: 'uppercase' }}>Delivery Address</h3>
-                <FloatingInput label="Street Address" />
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <FloatingInput label="City" />
-                  <FloatingInput label="District" />
-                </div>
-                <FloatingInput label="Postal Code" />
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                  <button onClick={() => setStep(1)} style={btnOutlineStyle}>Back</button>
-                  <button onClick={() => setStep(3)} style={btnStyle('var(--teal)')}>Next Step</button>
-                </div>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div>
-                <h3 style={{ color: 'var(--teal)', fontSize: '1.8rem', fontWeight: 900, marginBottom: '1.5rem', textTransform: 'uppercase' }}>Payment</h3>
-                
-                <div style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem', borderBottom: '1px solid #EEE' }}>
-                  <div onClick={() => setPaymentTab('mobile')} style={tabStyle(paymentTab === 'mobile')}>Mobile Banking</div>
-                  <div onClick={() => setPaymentTab('card')} style={tabStyle(paymentTab === 'card')}>Card Payment</div>
-                </div>
-
-                {paymentTab === 'mobile' && (
-                  <div>
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-                      {['bKash', 'Nagad', 'Rocket'].map(m => (
-                        <div key={m} onClick={() => setMobileMethod(m)} style={mobileCardStyle(mobileMethod === m)}>
-                          <span style={{ fontWeight: 900, fontSize: '1.1rem' }}>{m}</span>
-                        </div>
-                      ))}
-                    </div>
-                    {mobileMethod && <FloatingInput label={`Enter your ${mobileMethod} account number`} />}
-                  </div>
-                )}
-
-                {paymentTab === 'card' && (
-                  <div>
-                    <div style={{ position: 'relative' }}>
-                      <FloatingInput label="Card Number" value={cardNumber} onChange={formatCardNumber} />
-                      <span style={{ position: 'absolute', right: 0, top: '10px', fontWeight: 900, color: '#999' }}>{getCardType()}</span>
-                    </div>
-                    <FloatingInput label="Cardholder Name" />
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                      <FloatingInput label="Expiry Date (MM/YY)" />
-                      <FloatingInput label="CVV" type="password" />
-                    </div>
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                  <button onClick={() => setStep(2)} style={{...btnOutlineStyle, flex: 0.3}}>Back</button>
-                  <button onClick={handlePlaceOrder} style={{...btnStyle('var(--red)'), flex: 1, letterSpacing: '0.15em', fontWeight: 900, fontSize: '1.1rem'}}>PLACE ORDER</button>
-                </div>
-              </div>
-            )}
-          </>
+            <button 
+              type="submit"
+              style={{
+                width: '100%',
+                marginTop: '1rem',
+                padding: '1.25rem',
+                backgroundColor: '#014B60',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: '1.1rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                boxShadow: '0 10px 20px rgba(1, 75, 96, 0.2)',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                fontFamily: "'ITC Franklin Gothic LT', sans-serif"
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)' }}
+            >
+              Continue to Payment
+            </button>
+          </form>
         ) : (
-          <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-            <svg width="80" height="80" viewBox="0 0 100 100" style={{ margin: '0 auto 1.5rem auto' }}>
-              <circle cx="50" cy="50" r="45" fill="none" stroke="var(--teal)" strokeWidth="4" />
-              <path className="success-check" d="M30 50 L45 65 L70 35" fill="none" stroke="var(--teal)" strokeWidth="6" strokeDasharray="100" strokeDashoffset="100" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--teal)', margin: '0 0 1rem 0' }}>Order Placed!</h2>
-            <p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '2.5rem' }}>Thank you for choosing Caltex Bangladesh.</p>
-            <button onClick={handleClose} style={btnStyle('var(--teal)')}>Return to Site</button>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <button 
+              style={paymentBtnStyle}
+              onMouseEnter={(e) => { e.currentTarget.style.border = '2px solid #e2136e'; e.currentTarget.style.background = '#fcf0f5' }}
+              onMouseLeave={(e) => { e.currentTarget.style.border = '2px solid #eee'; e.currentTarget.style.background = '#fff' }}
+              onClick={() => alert('Redirecting to bKash gateway...')}
+            >
+              <div style={{ width: '40px', height: '40px', background: '#e2136e', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2H7v-2h2V9h2v7zm4 0h-2v-4h2v4z"/></svg>
+              </div>
+              Pay with bKash
+            </button>
+            
+            <button 
+              style={paymentBtnStyle}
+              onMouseEnter={(e) => { e.currentTarget.style.border = '2px solid #F35E19'; e.currentTarget.style.background = '#fcf2ee' }}
+              onMouseLeave={(e) => { e.currentTarget.style.border = '2px solid #eee'; e.currentTarget.style.background = '#fff' }}
+              onClick={() => alert('Redirecting to Nagad gateway...')}
+            >
+              <div style={{ width: '40px', height: '40px', background: '#F35E19', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                 <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M12 2L2 22h20L12 2zm0 4.5l6.5 13.5h-13L12 6.5z"/></svg>
+              </div>
+              Pay with Nagad
+            </button>
+
+            <button 
+              style={paymentBtnStyle}
+              onMouseEnter={(e) => { e.currentTarget.style.border = '2px solid #005A9C'; e.currentTarget.style.background = '#f0f5fa' }}
+              onMouseLeave={(e) => { e.currentTarget.style.border = '2px solid #eee'; e.currentTarget.style.background = '#fff' }}
+              onClick={() => alert('Redirecting to Visa/Mastercard gateway...')}
+            >
+              <div style={{ width: '40px', height: '40px', background: '#005A9C', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+              </div>
+              Credit / Debit Card
+            </button>
+            
+            <button 
+              onClick={() => setPhase('details')}
+              style={{ background: 'none', border: 'none', color: '#666', marginTop: '1rem', textDecoration: 'underline', cursor: 'pointer', fontFamily: "'ITC Franklin Gothic LT', sans-serif" }}
+            >
+              ← Back to Details
+            </button>
           </div>
         )}
       </div>
     </div>
   );
 }
-
-// Subcomponents & Styles
-
-function FloatingInput({ label, type = 'text', value, onChange }) {
-  const [focused, setFocused] = useState(false);
-  const [val, setVal] = useState('');
-  
-  const active = focused || val || (value !== undefined && value !== '');
-
-  return (
-    <div style={{ position: 'relative', marginBottom: '1.5rem', width: '100%' }}>
-      <label style={{
-        position: 'absolute',
-        top: active ? '-5px' : '15px',
-        left: '0',
-        fontSize: active ? '0.8rem' : '1rem',
-        color: active ? 'var(--teal)' : '#999',
-        transition: 'all 0.2s ease',
-        pointerEvents: 'none',
-        fontWeight: active ? 900 : 400
-      }}>{label}</label>
-      <input 
-        type={type}
-        value={value !== undefined ? value : val}
-        onChange={(e) => {
-          if(onChange) onChange(e);
-          else setVal(e.target.value);
-        }}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={{
-          width: '100%',
-          padding: '12px 0 5px 0',
-          border: 'none',
-          borderBottom: `2px solid ${focused ? 'var(--teal)' : '#CCC'}`,
-          background: 'transparent',
-          outline: 'none',
-          fontSize: '1.1rem',
-          color: '#333',
-          fontFamily: 'inherit'
-        }}
-      />
-    </div>
-  );
-}
-
-const btnStyle = (bg) => ({
-  width: '100%', padding: '14px', background: bg, color: '#FFF', border: 'none', borderRadius: '4px',
-  cursor: 'pointer', fontFamily: 'inherit', fontWeight: 900, textTransform: 'uppercase', transition: 'opacity 0.2s'
-});
-
-const btnOutlineStyle = {
-  flex: 1, padding: '14px', background: 'transparent', border: '2px solid #CCC', color: '#666', borderRadius: '4px',
-  cursor: 'pointer', fontFamily: 'inherit', fontWeight: 900, textTransform: 'uppercase'
-};
-
-const tabStyle = (active) => ({
-  paddingBottom: '0.8rem', cursor: 'pointer', fontWeight: 900, color: active ? 'var(--red)' : '#999',
-  borderBottom: active ? '2px solid var(--red)' : '2px solid transparent', transition: 'all 0.2s', marginBottom: '-1px'
-});
-
-const mobileCardStyle = (active) => ({
-  flex: 1, border: active ? '2px solid var(--teal)' : '2px solid #EEE', borderRadius: '4px', padding: '1rem',
-  textAlign: 'center', cursor: 'pointer', background: active ? '#F0F5F7' : '#FFF', transition: 'all 0.2s',
-  color: active ? 'var(--teal)' : '#999'
-});

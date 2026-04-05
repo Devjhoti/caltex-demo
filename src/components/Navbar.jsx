@@ -2,8 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-export default function Navbar() {
+export default function Navbar({ cartCount = 0, setIsCartOpen }) {
   const navRef = useRef(null);
+  const cartIconRef = useRef(null);
 
   useEffect(() => {
     gsap.to(navRef.current, {
@@ -52,6 +53,38 @@ export default function Navbar() {
         <a className="nav-link">Products</a>
         <a className="nav-link">Technology</a>
         <a className="nav-link">Locate Us</a>
+        
+        <div 
+          id="cart-icon"
+          ref={cartIconRef}
+          onClick={() => setIsCartOpen(true)}
+          style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          {cartCount > 0 && (
+            <div style={{
+              position: 'absolute',
+              top: '-8px',
+              right: '-12px',
+              backgroundColor: '#FF0000',
+              color: '#fff',
+              borderRadius: '50%',
+              width: '20px',
+              height: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '0.75rem',
+              fontWeight: 'bold',
+            }}>
+              {cartCount}
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );
