@@ -91,6 +91,12 @@ export default function Hero() {
           if (progressBarRef.current) {
             progressBarRef.current.style.width = `${self.progress * 100}%`;
           }
+        },
+        onLeave: () => {
+          // Trigger automated programmatic jump down to race the WhoWeAre section up
+          if (window.lenis) {
+            window.lenis.scrollTo('.next-section', { duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+          }
         }
       }
     });
@@ -139,18 +145,6 @@ export default function Hero() {
         },
         0 // sync at start
       );
-    });
-
-    // Fade out canvas and text right at the very end to seamlessly handoff to next section
-    gsap.to(heroWrapperRef.current, {
-      opacity: 0,
-      ease: 'power1.inOut',
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: '95% top',
-        end: '100% top',
-        scrub: true,
-      }
     });
 
     return () => {

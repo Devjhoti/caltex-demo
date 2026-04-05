@@ -47,7 +47,8 @@ export default function Navbar() {
           style={{ height: '40px', objectFit: 'contain' }}
         />
       </div>
-      <div style={{ display: 'flex', gap: '3rem', fontWeight: 600, fontSize: '1.1rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+      <div style={{ display: 'flex', gap: '3rem', fontWeight: 600, fontSize: '1.1rem', letterSpacing: '0.05em', textTransform: 'uppercase', alignItems: 'center' }}>
+
         <a className="nav-link">Products</a>
         <a className="nav-link">Technology</a>
         <a className="nav-link">Locate Us</a>

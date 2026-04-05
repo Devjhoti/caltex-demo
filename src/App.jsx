@@ -7,6 +7,7 @@ import Preloader from './components/Preloader';
 import Hero from './components/Hero';
 import Navbar from './components/Navbar';
 import WhoWeAre from './components/WhoWeAre';
+import Products from './components/Products';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,6 +29,7 @@ function App() {
     });
 
     lenis.on('scroll', ScrollTrigger.update);
+    window.lenis = lenis; // Expose globally for cross-section programmatic scroll logic
 
     gsap.ticker.add((time) => {
       lenis.raf(time * 1000);
@@ -36,6 +38,7 @@ function App() {
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      window.lenis = null;
       lenis.destroy();
       gsap.ticker.remove(lenis.raf);
     };
@@ -49,35 +52,7 @@ function App() {
       <Navbar />
       <Hero />
       <WhoWeAre />
-
-      {/* New Placeholder */}
-      <section 
-        style={{
-          position: 'relative',
-          minHeight: '100vh',
-          backgroundColor: '#0a0a0a', 
-          color: 'var(--white)',
-          padding: '4rem 2rem',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 20
-        }}
-      >
-        <h2 style={{ fontSize: '4rem', fontWeight: 900, color: 'var(--red)', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          More Innovation
-        </h2>
-        <p style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--gray-light)', maxWidth: '800px', textAlign: 'center', lineHeight: 1.6 }}>
-          Continuing the journey across our global brand.
-        </p>
-        
-        <div style={{ marginTop: '4rem', display: 'flex', gap: '2rem' }}>
-          <div style={{ width: '300px', height: '400px', backgroundColor: '#111', border: '1px solid #333' }} />
-          <div style={{ width: '300px', height: '400px', backgroundColor: '#111', border: '1px solid #333' }} />
-          <div style={{ width: '300px', height: '400px', backgroundColor: '#111', border: '1px solid #333' }} />
-        </div>
-      </section>
+      <Products />
     </div>
   );
 }

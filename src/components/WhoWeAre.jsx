@@ -9,9 +9,11 @@ export default function WhoWeAre() {
   const wordsRef = useRef([]);
   const copyRef = useRef(null);
   const lineRef = useRef(null);
+  const stickyWrapperRef = useRef(null);
 
   const logoWrapperRef = useRef(null);
   const logoImgRef = useRef(null);
+  const logoEntranceRef = useRef(null);
 
   useEffect(() => {
     // 1) Continuous 3D rotation for logo
@@ -39,19 +41,25 @@ export default function WhoWeAre() {
     const enterTl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: 'top center',
+        start: 'top 80%',
         toggleActions: 'play none none none',
       }
     });
 
-    enterTl.to(wordsRef.current, {
+    enterTl.to(logoEntranceRef.current, {
+      x: 0,
+      opacity: 1,
+      duration: 1,
+      ease: 'power3.out'
+    }, 0)
+    .to(wordsRef.current, {
       x: 0,
       opacity: 1,
       filter: 'blur(0px)',
       duration: 0.4,
       stagger: 0.2,
       ease: 'power4.out'
-    })
+    }, 0)
       .to(copyRef.current, {
         opacity: 1,
         duration: 0.8,
@@ -63,24 +71,15 @@ export default function WhoWeAre() {
         ease: 'power3.out'
       }, '+=0.2');
 
-    // 4) Pinning behavior
+    // 4) Pinning behavior natively mapped over static scroll coordinates bypassing DOM wrappers
     const pin = ScrollTrigger.create({
       trigger: containerRef.current,
       start: 'top top',
-      end: '+=100%',
-      pin: true,
-      anticipatePin: 1
-    });
-
-    // 5) Outro cinematic fade exactly like Hero
-    const exitTl = gsap.to(containerRef.current, {
-      opacity: 0,
-      ease: 'power1.inOut',
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: 'top -80%',
-        end: 'top -100%',
-        scrub: true
+      end: 'bottom bottom',
+      onLeave: () => {
+        if (window.lenis) {
+          window.lenis.scrollTo('.products-section', { duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+        }
       }
     });
 
@@ -88,8 +87,6 @@ export default function WhoWeAre() {
       pin.kill();
       enterTl.scrollTrigger?.kill();
       enterTl.kill();
-      exitTl.scrollTrigger?.kill();
-      exitTl.kill();
     };
   }, []);
 
@@ -99,16 +96,26 @@ export default function WhoWeAre() {
       className="next-section"
       style={{
         width: '100%',
-        height: '100vh',
-        backgroundColor: '#CBD0D2',
+        height: '200vh',
         position: 'relative',
-        overflow: 'hidden',
-        zIndex: 10,
-        display: 'flex'
+        zIndex: 10
       }}
     >
-      {/* Left Side - 2D Logo Elements (55%) */}
-      <div style={{ width: '50%', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div 
+        ref={stickyWrapperRef}
+        style={{ 
+          position: 'sticky', 
+          top: 0, 
+          height: '100vh', 
+          width: '100%', 
+          backgroundColor: '#CBD0D2', 
+          overflow: 'hidden', 
+          display: 'flex', 
+          paddingTop: '100px' 
+        }}
+      >
+        {/* Left Side - 2D Logo Elements (55%) */}
+        <div style={{ width: '50%', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 
         {/* Soft Radial Glow */}
         <div style={{
@@ -123,7 +130,7 @@ export default function WhoWeAre() {
         }} />
 
         {/* Floating Logo Complex */}
-        <div style={{ position: 'relative', perspective: '1200px' }}>
+        <div ref={logoEntranceRef} style={{ position: 'relative', perspective: '1200px', opacity: 0, transform: 'translateX(-150px)' }}>
           <div ref={logoWrapperRef} style={{ pointerEvents: 'none' }}>
             <img
               ref={logoImgRef}
@@ -212,6 +219,7 @@ export default function WhoWeAre() {
         </div>
       </div>
 
+      </div>
     </section>
   );
 }
