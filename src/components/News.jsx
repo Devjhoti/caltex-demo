@@ -9,7 +9,7 @@ const NEWS_DATA = [
   { id: 2, title: 'Caltex Havoline ProDS Relaunched', date: 'September 28, 2026', type: 'PRODUCT', img: '/products/Havoline Pro DS.png', desc: 'The new advanced formulation offers ultimate engine protection under extreme thermal load.' },
   { id: 3, title: 'Formula 1 Global Partnership', date: 'August 12, 2026', type: 'MOTORSPORT', img: '/logos/Caltex-Woodmark(Circular).png', desc: 'Caltex solidifies its presence on the track with a multi-year global racing partnership.' },
   { id: 4, title: 'Techron Tech Center Opened', date: 'July 05, 2026', type: 'INNOVATION', img: '/products/Caltex Techron.png', desc: 'A multi-million dollar R&D facility focusing on next-generation fuel additives opens in Dhaka.' },
-  { id: 5, title: 'Sustainability Goals 2030', date: 'June 20, 2026', type: 'GREEN FOCUS', img: '/logos/navbar-logo.png', desc: 'Driving a greener future with aggressive carbon reduction and recycled packaging initiatives.' },
+  { id: 5, title: 'Sustainability Goals 2030', date: 'June 20, 2026', type: 'GREEN FOCUS', img: '/products/Havoline Super 4T Semi Synthetic.png', desc: 'Driving a greener future with aggressive carbon reduction and recycled packaging initiatives.' },
   { id: 6, title: 'Super 4T Motorcycle Rally', date: 'May 14, 2026', type: 'EVENT', img: '/products/Havoline Super 4T.png', desc: 'Over 500 riders participated in the cross-country rally powered by Havoline Super 4T.' }
 ];
 
@@ -130,7 +130,7 @@ export default function News() {
               >
                 {/* Visual Header */}
                 <div style={{ height: '220px', background: 'radial-gradient(circle at center, rgba(1,75,96,0.3) 0%, rgba(0,0,0,0.2) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                  <img src={news.img} alt={news.title} style={{ height: '140px', objectFit: 'contain', zIndex: 2, filter: news.img.includes('navbar-logo') ? 'brightness(0) invert(1)' : 'none' }} />
+                  <img src={news.img} alt={news.title} style={{ height: '140px', objectFit: 'contain', zIndex: 2 }} />
                   <div style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', background: '#FF0000', color: '#FFF', fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', padding: '6px 14px', borderRadius: '50px', letterSpacing: '0.1em', zIndex: 3 }}>
                     {news.type}
                   </div>

@@ -174,8 +174,8 @@ export default function CheckoutModal({ isOpen, onClose, cartItems }) {
               onMouseLeave={(e) => { e.currentTarget.style.border = '2px solid #eee'; e.currentTarget.style.background = '#fff' }}
               onClick={() => alert('Redirecting to bKash gateway...')}
             >
-              <div style={{ width: '40px', height: '40px', background: '#e2136e', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2H7v-2h2V9h2v7zm4 0h-2v-4h2v4z"/></svg>
+              <div style={{ width: '80px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                <img src="/logos/bKash.png" alt="bKash" style={{ height: '35px', objectFit: 'contain' }} />
               </div>
               Pay with bKash
             </button>
@@ -186,20 +186,20 @@ export default function CheckoutModal({ isOpen, onClose, cartItems }) {
               onMouseLeave={(e) => { e.currentTarget.style.border = '2px solid #eee'; e.currentTarget.style.background = '#fff' }}
               onClick={() => alert('Redirecting to Nagad gateway...')}
             >
-              <div style={{ width: '40px', height: '40px', background: '#F35E19', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                 <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M12 2L2 22h20L12 2zm0 4.5l6.5 13.5h-13L12 6.5z"/></svg>
+              <div style={{ width: '80px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                <img src="/logos/nagad.png" alt="Nagad" style={{ height: '35px', objectFit: 'contain' }} />
               </div>
               Pay with Nagad
             </button>
 
             <button 
               style={paymentBtnStyle}
-              onMouseEnter={(e) => { e.currentTarget.style.border = '2px solid #005A9C'; e.currentTarget.style.background = '#f0f5fa' }}
+              onMouseEnter={(e) => { e.currentTarget.style.border = '2px solid #1434CB'; e.currentTarget.style.background = '#f0f5fa' }}
               onMouseLeave={(e) => { e.currentTarget.style.border = '2px solid #eee'; e.currentTarget.style.background = '#fff' }}
               onClick={() => alert('Redirecting to Visa/Mastercard gateway...')}
             >
-              <div style={{ width: '40px', height: '40px', background: '#005A9C', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+              <div style={{ width: '80px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                 <img src="/logos/VISA.png" alt="Visa" style={{ height: '24px', objectFit: 'contain' }} />
               </div>
               Credit / Debit Card
             </button>
