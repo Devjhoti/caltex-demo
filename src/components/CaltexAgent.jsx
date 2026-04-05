@@ -75,13 +75,9 @@ export default function CaltexAgent() {
     setIsTyping(true);
 
     try {
-      // Connect to the secure Vercel backend proxy
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+
+      const isLocal = import.meta.env.DEV;
+      const apiSettings = {
           model: "llama-3.3-70b-versatile",
           messages: [
             { role: "system", content: SYSTEM_PROMPT },
@@ -90,7 +86,15 @@ export default function CaltexAgent() {
           ],
           max_tokens: 1024,
           temperature: 0.7
-        })
+      };
+
+      const response = await fetch(isLocal ? 'https://api.groq.com/openai/v1/chat/completions' : '/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(isLocal ? { 'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}` } : {})
+        },
+        body: JSON.stringify(apiSettings)
       });
 
       const data = await response.json();
@@ -217,7 +221,12 @@ export default function CaltexAgent() {
         </div>
 
         {/* Messages Area */}
-        <div style={{ flex: 1, backgroundColor: '#F5F5F5', padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div 
+          data-lenis-prevent="true"
+          onWheelCapture={(e) => e.stopPropagation()}
+          onTouchMoveCapture={(e) => e.stopPropagation()}
+          style={{ flex: 1, backgroundColor: '#F5F5F5', padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px', overscrollBehavior: 'contain' }}
+        >
           {messages.map((msg, idx) => {
             const isUser = msg.role === 'user';
             return (
