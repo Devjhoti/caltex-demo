@@ -8,6 +8,7 @@ import Hero from './components/Hero';
 import Navbar from './components/Navbar';
 import WhoWeAre from './components/WhoWeAre';
 import Products from './components/Products';
+import News from './components/News';
 import Footer from './components/Footer';
 import CheckoutModal from './components/CheckoutModal';
 import CartModal from './components/CartModal';
@@ -59,6 +60,7 @@ function App() {
       <Hero />
       <WhoWeAre />
       <Products setCartItems={setCartItems} setIsCheckoutOpen={setIsCheckoutOpen} />
+      <News />
       <Footer />
 
       <CartModal 
